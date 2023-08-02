@@ -40,10 +40,12 @@ def test_create_users(test_client):
     data_2 = {"first_name": "Charles", "last_name": "Boyle", "password": "11", "email": "Charles@gmail.com"}
     response = test_client.post('/user', json=data_1)
     assert response.status_code == 201
+    assert_user_details(data_1, response.get_json()['message'])
     user_id = get_user_id(response)
     print_user_to_file(test_client, user_id)
     response = test_client.post('/user', json=data_2)
     assert response.status_code == 201
+    assert_user_details(data_2, response.get_json()['message'])
     user_id = get_user_id(response)
     print_user_to_file(test_client, user_id)
 
@@ -53,7 +55,8 @@ def test_get_user(test_client):
     user = get_user_by_email("test_user_1@gmail.com")
     response = test_client.get(f'/user/{user.id}')
     assert response.status_code == 200
-
+    assert_user_details(user, response.get_json()['user'], False)
+    
 
 # update existing user details
 def test_update_user(test_client):
@@ -61,6 +64,7 @@ def test_update_user(test_client):
     user = get_user_by_email("test_user_1@gmail.com")
     response = test_client.put(f'/user/{user.id}', json=data)
     assert response.status_code == 200
+    assert_user_details(data, response.get_json()['message'])
     print_user_to_file(test_client, user.id)
 
 
@@ -69,6 +73,7 @@ def test_delete_user(test_client):
     user = get_user_by_email("test_user_2@gmail.com")
     response = test_client.delete(f'/user/{user.id}')
     assert response.status_code == 200
+    assert user.id == response.get_json()['message']
 
 
 #### FAILURE TESTS ####
@@ -79,6 +84,7 @@ def test_create_existing_user(test_client):
     data = {"first_name": "test", "last_name": "user_2", "password": "11", "email": "test_user_3@gmail.com"}
     response = test_client.post('/user', json=data)
     assert response.status_code == 400
+    assert response.get_json()['message'] == 'Error! Email already exists'
 
 
 # update user that doesn't exist in DB
@@ -87,6 +93,7 @@ def test_update_non_existing_user(test_client):
     next_id = generate_id()
     response = test_client.put(f'/user/{next_id}', json=data)
     assert response.status_code == 400
+    assert response.get_json()['message'] == 'ERROR! user id not found'
 
 
 # delete user that doesn't exist in DB
@@ -94,6 +101,7 @@ def test_delete_non_existing_user(test_client):
     next_id = generate_id()
     response = test_client.delete(f'/user/{next_id}')
     assert response.status_code == 400
+    assert response.get_json()['message'] == 'ERROR! user id not found'
 
 
 # get user that doesn't exist in DB
@@ -101,7 +109,7 @@ def test_get_non_existing_user(test_client):
     next_id = generate_id()
     response = test_client.get(f'/user/{next_id}')
     assert response.status_code == 400
-
+    assert response.get_json()['message'] == 'ERROR! user id not found'
 
 # get user id from response message
 def get_user_id(response):
@@ -133,3 +141,16 @@ def create_test_user(firstName="first", lastName="last", email_addr="test@gmail.
         new_user = User(id=next_id, first_name=firstName, last_name=lastName, email=email_addr, password=password_key)
         db.session.add(new_user)
         db.session.commit()
+
+
+def assert_user_details(user, response, isJson=True):
+    if isJson:
+        assert user['first_name'] == response['first_name']
+        assert user['last_name'] == response['last_name']
+        assert user['email'].lower() == response['email']
+        assert user['password'] == response['password']
+    else:
+        assert user.first_name == response['first_name']
+        assert user.last_name == response['last_name']
+        assert user.email.lower() == response['email']
+        assert user.password == response['password']

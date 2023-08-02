@@ -25,9 +25,6 @@ def test_client():
 
     with flask_app.test_client() as testing_client:
         with flask_app.app_context():
-            create_test_user(email_addr="test_user_1@gmail.com")
-            create_test_user(email_addr="test_user_2@gmail.com")
-            create_test_user(email_addr="test_user_3@gmail.com")
             yield testing_client
 
 
@@ -52,6 +49,7 @@ def test_create_users(test_client):
 
 # get user details by id
 def test_get_user(test_client):
+    create_test_user(email_addr="test_user_1@gmail.com")
     user = get_user_by_email("test_user_1@gmail.com")
     response = test_client.get(f'/user/{user.id}')
     assert response.status_code == 200
@@ -60,6 +58,7 @@ def test_get_user(test_client):
 
 # update existing user details
 def test_update_user(test_client):
+    create_test_user(email_addr="test_user_1@gmail.com")
     data = {"first_name": "Jake", "last_name": "Peralta", "password": "11", "email": "Jake@gmail.com"}
     user = get_user_by_email("test_user_1@gmail.com")
     response = test_client.put(f'/user/{user.id}', json=data)
@@ -70,6 +69,7 @@ def test_update_user(test_client):
 
 # delete existing user
 def test_delete_user(test_client):
+    create_test_user(email_addr="test_user_2@gmail.com")
     user = get_user_by_email("test_user_2@gmail.com")
     response = test_client.delete(f'/user/{user.id}')
     assert response.status_code == 200

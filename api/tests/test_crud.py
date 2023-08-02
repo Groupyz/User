@@ -81,6 +81,7 @@ def test_delete_user(test_client):
 
 # create user that already exists in DB
 def test_create_existing_user(test_client):
+    create_test_user(email_addr="test_user_3@gmail.com")
     data = {"first_name": "test", "last_name": "user_2", "password": "11", "email": "test_user_3@gmail.com"}
     response = test_client.post('/user', json=data)
     assert response.status_code == 400

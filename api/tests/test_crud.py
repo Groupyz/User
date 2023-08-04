@@ -3,6 +3,9 @@ from app import app, db
 from DB.models import User
 from DB.dbHandler import generate_id
 
+USER_ID_ERROR_MESSAGE = 'ERROR! user id not found'
+EMAIL_ERROR_MESSAGE = 'Error! Email already exists'
+
 
 # delete all remaining users in db
 @pytest.fixture(scope="session", autouse=True)
@@ -85,7 +88,7 @@ def test_create_existing_user(test_client):
     data = {"first_name": "test", "last_name": "user_2", "password": "11", "email": "test_user_3@gmail.com"}
     response = test_client.post('/user', json=data)
     assert response.status_code == 400
-    assert response.get_json()['message'] == 'Error! Email already exists'
+    assert response.get_json()['message'] == EMAIL_ERROR_MESSAGE
 
 
 # update user that doesn't exist in DB
@@ -94,7 +97,7 @@ def test_update_non_existing_user(test_client):
     next_id = generate_id()
     response = test_client.put(f'/user/{next_id}', json=data)
     assert response.status_code == 400
-    assert response.get_json()['message'] == 'ERROR! user id not found'
+    assert response.get_json()['message'] == USER_ID_ERROR_MESSAGE
 
 
 # delete user that doesn't exist in DB
@@ -102,7 +105,7 @@ def test_delete_non_existing_user(test_client):
     next_id = generate_id()
     response = test_client.delete(f'/user/{next_id}')
     assert response.status_code == 400
-    assert response.get_json()['message'] == 'ERROR! user id not found'
+    assert response.get_json()['message'] == USER_ID_ERROR_MESSAGE
 
 
 # get user that doesn't exist in DB
@@ -110,7 +113,7 @@ def test_get_non_existing_user(test_client):
     next_id = generate_id()
     response = test_client.get(f'/user/{next_id}')
     assert response.status_code == 400
-    assert response.get_json()['message'] == 'ERROR! user id not found'
+    assert response.get_json()['message'] == USER_ID_ERROR_MESSAGE
 
 # get user id from response message
 def get_user_id(response):

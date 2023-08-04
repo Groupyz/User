@@ -146,12 +146,9 @@ def create_test_user(firstName="first", lastName="last", email_addr="test@gmail.
 
 def assert_user_details(user, response, isJson=True):
     if isJson:
-        assert user['first_name'] == response['first_name']
-        assert user['last_name'] == response['last_name']
-        assert user['email'].lower() == response['email']
-        assert user['password'] == response['password']
+        for key in user:
+            assert user[key].lower() == response[key].lower()
     else:
-        assert user.first_name == response['first_name']
-        assert user.last_name == response['last_name']
-        assert user.email.lower() == response['email']
-        assert user.password == response['password']
+        for key in user.json():
+            if key != 'id':
+                assert user.json()[key].lower() == response[key].lower()

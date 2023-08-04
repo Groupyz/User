@@ -43,12 +43,12 @@ def test_create_users(test_client):
     data_2 = create_json_user("Charles", "Boyle", "11", "Charles@gmail.com")
     response = test_client.post(f'/{PATH}', json=data_1)
     assert response.status_code == 201
-    assert_user_details(data_1, response.get_json()['message'])
+    assert_user_details(data_1, response.get_json().get('message'))
     user_id = get_user_id(response)
     print_user_to_file(test_client, user_id)
     response = test_client.post(f'/{PATH}', json=data_2)
     assert response.status_code == 201
-    assert_user_details(data_2, response.get_json()['message'])
+    assert_user_details(data_2, response.get_json().get('message'))
     user_id = get_user_id(response)
     print_user_to_file(test_client, user_id)
 
@@ -59,7 +59,7 @@ def test_get_user(test_client):
     user = get_user_by_email("test_user_1@gmail.com")
     response = test_client.get(f'/{PATH}/{user.id}')
     assert response.status_code == 200
-    assert_user_details(user, response.get_json()['user'], False)
+    assert_user_details(user, response.get_json().get('user'), False)
     
 
 # update existing user details
@@ -70,7 +70,7 @@ def test_update_user(test_client):
     user = get_user_by_email("test_user_1@gmail.com")
     response = test_client.put(f'/{PATH}/{user.id}', json=data)
     assert response.status_code == 200
-    assert_user_details(data, response.get_json()['message'])
+    assert_user_details(data, response.get_json().get('message'))
     print_user_to_file(test_client, user.id)
 
 
@@ -80,7 +80,7 @@ def test_delete_user(test_client):
     user = get_user_by_email("test_user_2@gmail.com")
     response = test_client.delete(f'/{PATH}/{user.id}')
     assert response.status_code == 200
-    assert user.id == response.get_json()['message']
+    assert user.id == response.get_json().get('message')
 
 
 #### FAILURE TESTS ####
@@ -93,7 +93,7 @@ def test_create_existing_user(test_client):
     data = create_json_user("test", "user_2", "11", "test_user_3@gmail.com")
     response = test_client.post(f'/{PATH}', json=data)
     assert response.status_code == 400
-    assert response.get_json()['message'] == EMAIL_ERROR_MESSAGE
+    assert response.get_json().get('message') == EMAIL_ERROR_MESSAGE
 
 
 # update user that doesn't exist in DB
@@ -103,7 +103,7 @@ def test_update_non_existing_user(test_client):
     next_id = generate_id()
     response = test_client.put(f'/{PATH}/{next_id}', json=data)
     assert response.status_code == 400
-    assert response.get_json()['message'] == USER_ID_ERROR_MESSAGE
+    assert response.get_json().get('message') == USER_ID_ERROR_MESSAGE
 
 
 # delete user that doesn't exist in DB
@@ -111,7 +111,7 @@ def test_delete_non_existing_user(test_client):
     next_id = generate_id()
     response = test_client.delete(f'/{PATH}/{next_id}')
     assert response.status_code == 400
-    assert response.get_json()['message'] == USER_ID_ERROR_MESSAGE
+    assert response.get_json().get('message') == USER_ID_ERROR_MESSAGE
 
 
 # get user that doesn't exist in DB
@@ -119,12 +119,12 @@ def test_get_non_existing_user(test_client):
     next_id = generate_id()
     response = test_client.get(f'/{PATH}/{next_id}')
     assert response.status_code == 400
-    assert response.get_json()['message'] == USER_ID_ERROR_MESSAGE
+    assert response.get_json().get('message') == USER_ID_ERROR_MESSAGE
 
 # get user id from response message
 def get_user_id(response):
     user = response.get_json()
-    user_id = user['message']['id']
+    user_id = user.get('message').get('id')
     return user_id
 
 

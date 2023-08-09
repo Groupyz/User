@@ -3,9 +3,12 @@ from DB.dbHandler import Crud
 from app import app, db
 from DB.dbErrors import handle_errors, UserNotFoundError
 
+PATH = "user"
+ID = "<int:id>"
+
 
 # Create a user
-@app.route("/user", methods=['POST'])
+@app.route(f"/{PATH}", methods=['POST'])
 def create_user_route():
     try:
         data = request.get_json()
@@ -17,7 +20,7 @@ def create_user_route():
         handle_errors(error_message)
 
 
-@app.route("/user/<int:id>", methods=['GET', 'PUT', 'DELETE'])
+@app.route(f"/{PATH}/{ID}", methods=['GET', 'PUT', 'DELETE'])
 def handle_user_route(id):
     if request.method == 'GET':
         # Get a user by ID

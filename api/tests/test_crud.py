@@ -3,9 +3,7 @@ from app import app, db
 from DB.models import User
 from DB.dbHandler import generate_id
 from routes import PATH
-
-USER_ID_ERROR_MESSAGE = 'ERROR! user id not found'
-EMAIL_ERROR_MESSAGE = 'Error! Email already exists'
+from DB.dbErrors import USER_ID_ERROR_MESSAGE, EMAIL_ERROR_MESSAGE
 
 
 # delete all remaining users in db

@@ -3,9 +3,7 @@ from app import app, db
 from DB.models import User
 from DB.dbHandler import generate_id
 from routes import PATH
-
-USER_ID_ERROR_MESSAGE = 'ERROR! user id not found'
-EMAIL_ERROR_MESSAGE = 'Error! Email already exists'
+from DB.dbErrors import USER_ID_ERROR_MESSAGE, EMAIL_ERROR_MESSAGE
 
 
 # delete all remaining users in db
@@ -37,9 +35,7 @@ def test_client():
 
 # create 2 users for test and print them to output.txt
 def test_create_users(test_client):
-    # data_1 = {"first_name": "Terry", "last_name": "Jeffords", "password": "10", "email": "Terry@gmail.com"}
     data_1 = create_json_user("Terry", "Jeffords", "10", "Terry@gmail.com")
-    # data_2 = {"first_name": "Charles", "last_name": "Boyle", "password": "11", "email": "Charles@gmail.com"}
     data_2 = create_json_user("Charles", "Boyle", "11", "Charles@gmail.com")
     response = test_client.post(f'/{PATH}', json=data_1)
     assert response.status_code == 201
@@ -65,7 +61,6 @@ def test_get_user(test_client):
 # update existing user details
 def test_update_user(test_client):
     create_test_user(email_addr="test_user_1@gmail.com")
-    # data = {"first_name": "Jake", "last_name": "Peralta", "password": "11", "email": "Jake@gmail.com"}
     data = create_json_user("Jake", "Peralta", "11", "Jake@gmail.com")
     user = get_user_by_email("test_user_1@gmail.com")
     response = test_client.put(f'/{PATH}/{user.id}', json=data)
@@ -89,7 +84,6 @@ def test_delete_user(test_client):
 # create user that already exists in DB
 def test_create_existing_user(test_client):
     create_test_user(email_addr="test_user_3@gmail.com")
-    # data = {"first_name": "test", "last_name": "user_2", "password": "11", "email": "test_user_3@gmail.com"}
     data = create_json_user("test", "user_2", "11", "test_user_3@gmail.com")
     response = test_client.post(f'/{PATH}', json=data)
     assert response.status_code == 400
@@ -98,7 +92,6 @@ def test_create_existing_user(test_client):
 
 # update user that doesn't exist in DB
 def test_update_non_existing_user(test_client):
-    # data = {"first_name": "Jake", "last_name": "Peralta", "password": "11", "email": "Jake@gmail.com"}
     data = create_json_user("Jake", "Peralta", "11", "Jake@gmail.com")
     next_id = generate_id()
     response = test_client.put(f'/{PATH}/{next_id}', json=data)
